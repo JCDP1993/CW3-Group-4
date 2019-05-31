@@ -1,0 +1,111 @@
+/**
+
+Digital Manipulation of Victor Pasmore's Paintings
+  Amber Seychell
+  Gaynor D'Amato
+  Jeremy Cassar
+  Raquel Vella
+
+This program captures a camera input and outputs it as a number of particles.
+Layered on top are larger particles composed from the colours of Pasmore's paintings.
+
+BEFORE YOU RUN
+- Please be patient as the program takes quite some time to fully run, especially the camera output
+- Keep volume sound low as at first it is quite loud.
+- You can change which image the colours are captured from by changing the 'number' variable
+from 1, 2 or 3.
+- Libraries used:
+    Sound
+    Toxic Libs
+    ColorScheme
+    GLVideo
+    Simple Touch
+
+*/
+
+//import necessary libraries
+import processing.sound.*;
+import processing.io.*;
+import toxi.color.*;
+import toxi.math.*;
+import jto.colorscheme.*;
+import gohai.glvideo.*;
+
+//declare two objects, one for camera particles, one for painting particles
+Particle[] particles;
+Painting_Particle[] particles2;
+
+//define colour palette object, sine wave for sound object and webcam object
+ColorScheme cs;
+SinOsc sine;
+GLCapture webcam;
+
+//ellipse_width is declared here as it is used with the sine wave variables
+float ellipse_width;
+//change this number to 1, 2 or 3 to get different colour schemes
+int number = 1;
+String FILE = "0" + number + ".jpg";
+//declare an array for the colours
+color[] colors;
+
+void setup() {
+  //size of output, P3D is required to make the sketch run faster
+  size(640, 480, P3D);
+  //specify input of push button
+  GPIO.pinMode(17, GPIO.INPUT_PULLUP);
+
+  //object for sound, and starts playing
+  sine = new SinOsc(this);
+  sine.play();
+
+  //initialize a colourscheme object and write the colours to the array
+  cs = new ColorScheme(FILE, this);
+  colors = cs.toArray(); 
+
+  //initialize webcam and start
+  webcam = new GLCapture(this);
+  webcam.start();
+
+  //create 1000 particles through the Particle class
+  particles = new Particle [1000];
+  for (int i = 0; i < particles.length; i++) {
+    particles[i] = new Particle();
+  }
+
+  //create particles according to how many colours in the colour scheme there are through the Painting_Particle class
+  particles2 = new Painting_Particle [colors.length];
+  for (int i = 0; i < particles2.length; i++) {
+    //parameters for colour, width and height are initialised with each particle created
+    particles2[i] = new Painting_Particle(i, random(100, 200), random(100, 300));
+  }
+
+  background(0);
+}
+
+void draw() {
+
+  //if webcam is available, output
+  if (webcam.available()) {
+    webcam.read();
+  }
+
+  for (int i = 0; i < particles.length; i++) {   
+    //sets the sine wave to start playing according to the width of the camera particle
+    sine.set(ellipse_width, 0.1, 0.0, 1);
+    //runs display and move methods
+    particles[i].display();
+    particles[i].move();
+  }
+
+  for (int i = 0; i < particles2.length; i++) {
+    //runs display and move methods of the painting particles
+    particles2[i].display();
+    particles2[i].move();
+    
+    //when push button is pressed an image is captured in the sketchbook folder
+    while (GPIO.digitalRead(17) == GPIO.LOW) {
+      saveFrame("blobs-###.png");
+      println("Frame was captured!");
+    }
+  }
+}
