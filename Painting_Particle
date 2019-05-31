@@ -1,0 +1,52 @@
+class Painting_Particle {
+  float x;
+  float y;
+
+  float ellipse_c;
+  float ellipse_w;
+  float ellipse_h;
+  
+  float vx;
+  float vy;
+
+  Painting_Particle(float ellipse_colour, float ellipse_width, float ellipse_height) {
+    x = width/2;
+    y = height/2;
+    float a = random(TWO_PI);
+    float speed = random(10, 50);
+    vx = cos(a)*speed;
+    vy = sin(a)*speed;
+    
+    //variables for colour, width and height are set
+    ellipse_c = ellipse_colour;
+    ellipse_w = ellipse_width;
+    ellipse_h = ellipse_height;    
+  }
+
+  void display() {
+    noStroke();
+    //fill each particle with colours from the colour scheme
+    fill(colors[int(ellipse_c)]);
+    ellipse(x, y, ellipse_w, ellipse_h);
+  }
+
+  //movement of particles
+  void move() {
+    x = x + vx;//random(-5, 5);
+    y = y + vy;//random(-5, 5);
+    if (y < 0) {
+      y = height;
+    } 
+
+    if (y > height) {
+      y = 0;
+    }
+    if (x < 0) {
+      x = width;
+    } 
+
+    if (x > width) {
+      x = 0;
+    }
+  }
+}
