@@ -1,0 +1,47 @@
+class Particle {
+  float x;
+  float y;
+
+  float vx;
+  float vy;
+
+
+  Particle() {
+    x = width/2;
+    y = height/2;
+    float a = random(TWO_PI);
+    float speed = random(10, 50);
+    vx = cos(a)*speed;
+    vy = sin(a)*speed;
+  }
+
+  void display() {
+    noStroke();
+    //get colours from webcam image and fill each particle accordingly
+    color c = webcam.get(int(x), int(y));
+    fill(c, 150);
+    //horizontal movement of the mouse will change the width of the particle and also the sound
+    ellipse_width = 0.1*mouseX;
+    ellipse(x, y, ellipse_width, random(10, 60));
+  }
+  
+  //movement of particles same as painting particles
+  void move() {
+    x = x + vx;//random(-5, 5);
+    y = y + vy;//random(-5, 5);
+    if (y < 0) {
+      y = height;
+    } 
+
+    if (y > height) {
+      y = 0;
+    }
+    if (x < 0) {
+      x = width;
+    } 
+
+    if (x > width) {
+      x = 0;
+    }
+  }
+}
